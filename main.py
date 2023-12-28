@@ -3,10 +3,11 @@ from PIL import ImageTk,Image
 from tkinter import PhotoImage
 from ttkthemes import ThemedTk
 from tkcalendar import DateEntry
+from tkinter import ttk
 
 root = Tk()
 root.title("FitFolio")
-icon_image = PhotoImage(file="images/heart.png")
+icon_image = PhotoImage(file=".env\FitFolio\images\heart.png")  #NOTE: use your own relative path for the particular image
 root.iconphoto(True, icon_image) 
 root.geometry("450x330")
 root.resizable(0, 0) #fixed size of the window
@@ -57,12 +58,24 @@ def create_acc_click():
     #gender
     gender_dalo = Label(create_acc_window,text="Gender: ")
     gender_dalo.grid(row=7,column=0)
-    options = ["Male","Female","Other"]
-    clicked = StringVar()
-    clicked.set(options[0])
 
-    drop = OptionMenu(create_acc_window,clicked,*options)
-    drop.grid(row=7,column=1,sticky=W, padx=5, pady=5)   # or radio buttons
+    #options = ["Male","Female","Other"]
+
+    # drop = OptionMenu(create_acc_window,clicked,*options)
+    # drop.grid(row=7,column=1,sticky=W, padx=5, pady=5)   # or radio buttons
+
+    # r = ttk.Radiobutton(create_acc_window, text='Male', value='M', variable=clicked)
+    # r.grid(row = 7, column=1, sticky= W, padx=5, pady=5)
+
+    gender_frame = Frame(create_acc_window)
+    gender_frame.grid(row=7, column=1, columnspan=2, sticky=W, pady=5)
+
+    options= [["Male","M"],["Female","F"],["Other","Oth"]]
+    clicked = StringVar()
+    clicked.set("None")
+
+    for option in options:
+        r = ttk.Radiobutton(gender_frame, text=option[0], value=option[1], variable=clicked).pack(side='left', padx=5)
 
     signup_btn = Button(create_acc_window,text="Sign up",padx=10,pady=5)
     signup_btn.grid(row=8,column=0,columnspan=2, padx=5, pady=10)
@@ -103,51 +116,55 @@ def user_click():
    create_acc = Button(top,text=create_acc_text,pady=3,relief="flat", borderwidth=0,underline=len(create_acc_text),command=create_acc_click)
    create_acc.grid(row=5,columnspan=2,column=0)
 
-image = Image.open("images/user.png")  
+image = Image.open(r'.env\FitFolio\images\user.png')
 photo = ImageTk.PhotoImage(image)
 user_btn = Button(root,image=photo,command=user_click)
 user_btn.grid(row=0,column=1, sticky=E, padx=5, pady=5,ipadx=10,ipady=10)
 user_btn.image = photo # Setting the image as a reference to prevent it from being garbage collected
 
-class ImageButton(Button):
-    def __init__(self, master=None, **kwargs):
-        Button.__init__(self, master, compound="left", **kwargs)
-        self.image = kwargs.get('image', None)
-        self.text = kwargs.get('text', None)
+# class ImageButton(Button):
+#     def __init__(self, master=None, **kwargs):
+#         Button.__init__(self, master, compound="left", **kwargs)
+#         self.image = kwargs.get('image', None)
+#         self.text = kwargs.get('text', None)
 
-        if self.image and self.text:
-            self.update_text_image()
+#         if self.image and self.text:
+#             self.update_text_image()
 
-    def update_text_image(self):
-        if self.image and self.text:
-            self.config(text=self.text, image=self.image, compound="left")
+#     def update_text_image(self):
+#         if self.image and self.text:
+#             self.config(text=self.text, image=self.image, compound="left")
 
-label = Label(root,text="Track Yourself Now!!", font=("Helvetica", 20),pady=10)
+label = Label(root,text="Track Yourself Now!!", font=("Helvetica", 20), pady=10)
 label.grid(row=1,column=0,columnspan=2)
 
-
 # activity button
-activity_image = PhotoImage(file='images/activity.png')
+activity_image = PhotoImage(file=r'.env\FitFolio\images\activity.png')
 resized_image = activity_image.subsample(2, 2)
-activity_btn = ImageButton(root, text=" Activity ", image=resized_image, font=("Verdana", 12),padx=5,pady=5)
+activity_btn = Button(root,text="Activity", image=resized_image, compound=LEFT, font=("Verdana", 12), padx=5, pady=5)
+activity_btn.image = resized_image
+#activity_btn = ImageButton(root, text=" Activity ", image=resized_image, font=("Verdana", 12),padx=5,pady=5)
 activity_btn.grid(row=3,column=0, pady=(20,10),ipadx=15)
 
 # mindfullness button
-mindful_image = PhotoImage(file='images/mindfulness.png')
+mindful_image = PhotoImage(file=r'.env\FitFolio\images\mindfulness.png')
 resized_image = mindful_image.subsample(2, 2)
-mindful_btn = ImageButton(root, text=" Mindfulness ", image=resized_image, font=("Verdana", 12),padx=5,pady=5)
+mindful_btn = Button(root, text=" Mindfulness ", image=resized_image, compound=LEFT, font=("Verdana", 12),padx=5,pady=5)
+mindful_btn.image = resized_image
 mindful_btn.grid(row=3,column=1,pady=(20, 15))
 
 # body button
-body_image = PhotoImage(file='images/body.png')
+body_image = PhotoImage(file=r'.env\FitFolio\images\body.png')
 resized_image = body_image.subsample(2, 2)
-body_btn = ImageButton(root, text=" Body ", image=resized_image, font=("Verdana", 12),padx=5,pady=5)
+body_btn = Button(root, text=" Body ", image=resized_image, compound=LEFT, font=("Verdana", 12),padx=5,pady=5)
+body_btn.image = resized_image
 body_btn.grid(row=4,column=0,pady=(10, 15),ipadx=25)
 
 # sleep button
-sleep_image = PhotoImage(file='images/sleep.png')
+sleep_image = PhotoImage(file=r'.env\FitFolio\images\sleep.png')
 resized_image = sleep_image.subsample(2, 2)
-sleep_btn = ImageButton(root, text=" Sleep ", image=resized_image, font=("Verdana", 12),padx=5,pady=5)
+sleep_btn = Button(root, text=" Sleep ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5)
+sleep_btn.image = resized_image
 sleep_btn.grid(row=4,column=1,pady=(10, 15),ipadx=25)
 
 
