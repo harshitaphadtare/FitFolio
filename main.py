@@ -3,6 +3,8 @@ from PIL import ImageTk,Image
 from tkinter import PhotoImage
 from ttkthemes import ThemedTk
 from tkcalendar import DateEntry
+from tkinter import ttk
+
 
 root = Tk()
 root.title("FitFolio")
@@ -15,36 +17,133 @@ root.resizable(0, 0) #fixed size of the window
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
 
+# on clicking walking button 
+def step_click():
+    page1.withdraw()
+    steps = Toplevel()
+    steps.title("Steps")
+    steps.geometry("450x530")
+    steps.resizable(0, 0)
+    steps.columnconfigure(0, weight=1)
+    steps.columnconfigure(1, weight=1)
+
+    back_img = PhotoImage(file="images/back_arrow.png")
+    resize_back = back_img.subsample(2,2)
+    back_btn = Button(steps,image=resize_back,padx=10,pady=10,relief="flat", borderwidth=0)
+    back_btn.grid(row=0, column=0, padx=5,sticky=NW)
+
+    act_heading = Label(steps,text="Walking",font=("Helvetica", 25))
+    act_heading.grid(row=1,column=0,columnspan=2,pady=(0,10))
+
+    # dropdown for timeperiod
+    options = ["3-Days","Weekly","Month","Yearly"]
+    clicked = StringVar()
+    clicked.set("Select Timeperiod")
+    drop = OptionMenu(steps,clicked,*options)
+    drop.grid(row=2,column=0,columnspan=2)
+
+    #graph section
+    frame_step = LabelFrame(steps,padx=200,pady=100)
+    frame_step.grid(row=3,column=0,columnspan=2,pady=(10,0))
+
+    label_step = Label(frame_step,text="Graph")
+    label_step.grid(row=3,column=0,)
+
+    label_step = Label(steps,text="Track Calories you Burnt Today!!",font=("Verdana", 13),fg="red")
+    label_step.grid(row=4,column=0,columnspan=2,pady=(10,2))
+
+    #distance
+    distance = Label(steps,text="Distance (Km): ",font=("Verdana", 10))
+    distance.grid(row=5,column=0,pady=(15,0),padx=(20,5))
+    distance_entry = Entry(steps,width=35)
+    distance_entry.grid(row=5,column=1, padx=(0,40), pady=(15,0))
+
+    #time
+    time = Label(steps,text="Time (Hr): ",font=("Verdana", 10))
+    time.grid(row=6,column=0,pady=(10,0),padx=(20,5))
+    time_entry = Entry(steps,width=35)
+    time_entry.grid(row=6,column=1, padx=(0,40), pady=(15,0))
+
+    #add button
+    add_btn = Button(steps, text="Add", padx=40, pady=3,font=("Verdana", 10))
+    add_btn.grid(row=7, column=0, pady=(20, 0), sticky=E, padx=(70, 5)) 
+
+    #show record btn
+    show_acc = Button(steps, text="Show record", pady=3, padx=30,font=("Verdana", 10))
+    show_acc.grid(row=7, column=1, sticky=W, pady=(20, 0), padx=(5, 0)) 
+
+
+    steps.mainloop()
+
 def activity_page():
+    global page1
     page1 = Toplevel()
+
     page1.title("Activity")
-    page1.geometry("300x300")
+    # page1.geometry("350x350")
     page1.resizable(0, 0)
     page1.columnconfigure(0, weight=1)
     page1.columnconfigure(1, weight=1)
 
+    #back to main page
+    back_img = PhotoImage(file="images/back_arrow.png")
+    resize_back = back_img.subsample(2,2)
+    back_btn = Button(page1,image=resize_back,padx=10,pady=10,relief="flat", borderwidth=0)
+    back_btn.grid(row=0, column=0, padx=5,sticky=NW)
+
     act_heading = Label(page1,text="Activity",font=("Helvetica", 25))
-    act_heading.grid(row=0,column=0,columnspan=2,pady=(10,0))
+    act_heading.grid(row=1,column=0,columnspan=2,pady=(0,10))
 
-    steps_img = PhotoImage(file="images\walk.png")
-    resize_steps = steps_img.subsample(1,1)
-    steps_btn = Button(page1,image=resize_steps,padx=10,pady=10,relief="flat", borderwidth=0)
-    steps_btn.grid(row=3, column=0, padx=10, pady=(20,10))
+    # walking 
+    frame = LabelFrame(page1,padx=20,pady=10)
+    frame.grid(row=2,column=0)
 
-    cycle_img = PhotoImage(file="images\cycle.png")
-    resize_cycle = cycle_img.subsample(1,1)
-    cycle_btn = Button(page1,image=resize_cycle,padx=10,pady=10,relief="flat", borderwidth=0)
-    cycle_btn.grid(row=3, column=1, padx=10, pady=(20,10))
+    img = PhotoImage(file="images/walk.png")
+    resize = img.subsample(2,2)
+    btn = Button(frame,image=resize,text="  Walking ",pady=5,compound=LEFT, font=("Verdana", 13),relief="flat",borderwidth=0,command=step_click)
+    btn.grid(row=0,column=0,sticky=W,padx=(0,112))
 
-    run_img = PhotoImage(file="images/run.png")
-    resize_run = run_img.subsample(1,1)
-    run_btn = Button(page1,image=resize_run,padx=10,pady=10,relief="flat", borderwidth=0)
-    run_btn.grid(row=4, column=0, padx=10, pady=10)
+    img1 = PhotoImage(file="images/forward.png")
+    resize1 = img1.subsample(3,3)
+    btn_walk = Button(frame,image=resize1,padx=20,pady=10,compound=RIGHT,relief="flat",borderwidth=0,command=step_click)
+    btn_walk.grid(row=0,column=1, sticky=E)
 
-    workout_img = PhotoImage(file="images/workout.png")
-    resize_workout = workout_img.subsample(1,1)
-    workout_btn = Button(page1,image=resize_steps,padx=10,pady=10,relief="flat", borderwidth=0)
-    workout_btn.grid(row=4, column=1, padx=10, pady=10)
+
+    #cycling 
+    frame = LabelFrame(page1,padx=20,pady=10)
+    frame.grid(row=3,column=0)
+
+    img_cycle = PhotoImage(file="images\cycle.png")
+    resize_cycle = img_cycle.subsample(2,2)
+    btn = Button(frame,image=resize_cycle,text="  Cycling ",pady=5,compound=LEFT, font=("Verdana", 13),relief="flat",borderwidth=0)
+    btn.grid(row=0,column=0,sticky=W,padx=(0,120))
+
+    btn = Button(frame,image=resize1,padx=15,pady=10,compound=RIGHT,relief="flat",borderwidth=0)
+    btn.grid(row=0,column=1, sticky=E)
+
+    #workout
+    frame = LabelFrame(page1,padx=20,pady=10)
+    frame.grid(row=4,column=0)
+
+    img_workout= PhotoImage(file="images\workout.png")
+    resize_workout = img_workout.subsample(2,2)
+    btn = Button(frame,image=resize_workout,text="  Workout ",pady=5,compound=LEFT, font=("Verdana", 13),relief="flat",borderwidth=0)
+    btn.grid(row=0,column=0,sticky=W,padx=(0,109))
+
+    btn = Button(frame,image=resize1,padx=20,pady=10,compound=RIGHT,relief="flat",borderwidth=0)
+    btn.grid(row=0,column=1, sticky=E)
+
+    #running
+    frame = LabelFrame(page1,padx=20,pady=10)
+    frame.grid(row=5,column=0)
+
+    img_running= PhotoImage(file="images/run.png")
+    resize_running = img_running.subsample(2,2)
+    btn = Button(frame,image=resize_running,text="  Running ",pady=5,compound=LEFT, font=("Verdana", 13),relief="flat",borderwidth=0)
+    btn.grid(row=0,column=0,sticky=W,padx=(0,109))
+
+    btn = Button(frame,image=resize1,padx=20,pady=10,compound=RIGHT,relief="flat",borderwidth=0)
+    btn.grid(row=0,column=1, sticky=E)
 
     page1.mainloop()
 
@@ -142,7 +241,7 @@ def user_click():
 
 image = Image.open("images/user.png")  
 photo = ImageTk.PhotoImage(image)
-user_btn = Button(root,image=photo,command=user_click)
+user_btn = Button(root,image=photo,command=user_click,relief="flat", borderwidth=0)
 user_btn.grid(row=0,column=1, sticky=E, padx=5, pady=5,ipadx=10,ipady=10)
 user_btn.image = photo # Setting the image as a reference to prevent it from being garbage collected
 
@@ -171,10 +270,10 @@ body_btn = Button(root, text=" Body ", image=resized_image,compound=LEFT, font=(
 body_btn.image = resized_image
 body_btn.grid(row=4,column=0,pady=(10, 15),ipadx=25)
 
-# sleep button
+
 sleep_image = PhotoImage(file='images/sleep.png')
 resized_image = sleep_image.subsample(2, 2)
-sleep_btn = Button(root, text=" Sleep ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5)
+sleep_btn = Button(root, text=" Sleep ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5) 
 sleep_btn.image = resized_image
 sleep_btn.grid(row=4,column=1,pady=(10, 15),ipadx=25)
 
