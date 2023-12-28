@@ -15,6 +15,41 @@ root.resizable(0, 0) #fixed size of the window
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
 
+def activity_page():
+    page1 = Toplevel()
+    page1.title("Activity")
+    page1.geometry("300x300")
+    page1.resizable(0, 0)
+    page1.columnconfigure(0, weight=1)
+    page1.columnconfigure(1, weight=1)
+
+    act_heading = Label(page1,text="Activity",font=("Helvetica", 25))
+    act_heading.grid(row=0,column=0,columnspan=2,pady=(10,0))
+
+    steps_img = PhotoImage(file="images\walk.png")
+    resize_steps = steps_img.subsample(1,1)
+    steps_btn = Button(page1,image=resize_steps,padx=10,pady=10,relief="flat", borderwidth=0)
+    steps_btn.grid(row=3, column=0, padx=10, pady=(20,10))
+
+    cycle_img = PhotoImage(file="images\cycle.png")
+    resize_cycle = cycle_img.subsample(1,1)
+    cycle_btn = Button(page1,image=resize_cycle,padx=10,pady=10,relief="flat", borderwidth=0)
+    cycle_btn.grid(row=3, column=1, padx=10, pady=(20,10))
+
+    run_img = PhotoImage(file="images/run.png")
+    resize_run = run_img.subsample(1,1)
+    run_btn = Button(page1,image=resize_run,padx=10,pady=10,relief="flat", borderwidth=0)
+    run_btn.grid(row=4, column=0, padx=10, pady=10)
+
+    workout_img = PhotoImage(file="images/workout.png")
+    resize_workout = workout_img.subsample(1,1)
+    workout_btn = Button(page1,image=resize_steps,padx=10,pady=10,relief="flat", borderwidth=0)
+    workout_btn.grid(row=4, column=1, padx=10, pady=10)
+
+    page1.mainloop()
+
+
+#signup page
 def create_acc_click():
     top.withdraw()
     create_acc_window = Toplevel()
@@ -57,17 +92,19 @@ def create_acc_click():
     #gender
     gender_dalo = Label(create_acc_window,text="Gender: ")
     gender_dalo.grid(row=7,column=0)
-    options = ["Male","Female","Other"]
+
+    gender_frame = Frame(create_acc_window)
+    gender_frame.grid(row=7, column=1, columnspan=2, sticky=W, pady=5)
+    
+    options= [["Male","M"],["Female","F"],["Other","Oth"]]
     clicked = StringVar()
-    clicked.set(options[0])
+    clicked.set("None")
 
-    drop = OptionMenu(create_acc_window,clicked,*options)
-    drop.grid(row=7,column=1,sticky=W, padx=5, pady=5)   # or radio buttons
-
+    for option in options:
+        r = Radiobutton(gender_frame, text=option[0], value=option[1], variable=clicked).pack(side='left', padx=5)
+    
     signup_btn = Button(create_acc_window,text="Sign up",padx=10,pady=5)
     signup_btn.grid(row=8,column=0,columnspan=2, padx=5, pady=10)
-
-
 
 # login page opens when user button is clicked
 def user_click():
@@ -109,19 +146,6 @@ user_btn = Button(root,image=photo,command=user_click)
 user_btn.grid(row=0,column=1, sticky=E, padx=5, pady=5,ipadx=10,ipady=10)
 user_btn.image = photo # Setting the image as a reference to prevent it from being garbage collected
 
-class ImageButton(Button):
-    def __init__(self, master=None, **kwargs):
-        Button.__init__(self, master, compound="left", **kwargs)
-        self.image = kwargs.get('image', None)
-        self.text = kwargs.get('text', None)
-
-        if self.image and self.text:
-            self.update_text_image()
-
-    def update_text_image(self):
-        if self.image and self.text:
-            self.config(text=self.text, image=self.image, compound="left")
-
 label = Label(root,text="Track Yourself Now!!", font=("Helvetica", 20),pady=10)
 label.grid(row=1,column=0,columnspan=2)
 
@@ -129,25 +153,29 @@ label.grid(row=1,column=0,columnspan=2)
 # activity button
 activity_image = PhotoImage(file='images/activity.png')
 resized_image = activity_image.subsample(2, 2)
-activity_btn = ImageButton(root, text=" Activity ", image=resized_image, font=("Verdana", 12),padx=5,pady=5)
+activity_btn = Button(root, text=" Activity ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5,command=activity_page)
+activity_btn.image = resized_image
 activity_btn.grid(row=3,column=0, pady=(20,10),ipadx=15)
 
 # mindfullness button
 mindful_image = PhotoImage(file='images/mindfulness.png')
 resized_image = mindful_image.subsample(2, 2)
-mindful_btn = ImageButton(root, text=" Mindfulness ", image=resized_image, font=("Verdana", 12),padx=5,pady=5)
+mindful_btn = Button(root, text=" Mindfulness ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5)
+mindful_btn.image = resized_image
 mindful_btn.grid(row=3,column=1,pady=(20, 15))
 
 # body button
 body_image = PhotoImage(file='images/body.png')
 resized_image = body_image.subsample(2, 2)
-body_btn = ImageButton(root, text=" Body ", image=resized_image, font=("Verdana", 12),padx=5,pady=5)
+body_btn = Button(root, text=" Body ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5)
+body_btn.image = resized_image
 body_btn.grid(row=4,column=0,pady=(10, 15),ipadx=25)
 
 # sleep button
 sleep_image = PhotoImage(file='images/sleep.png')
 resized_image = sleep_image.subsample(2, 2)
-sleep_btn = ImageButton(root, text=" Sleep ", image=resized_image, font=("Verdana", 12),padx=5,pady=5)
+sleep_btn = Button(root, text=" Sleep ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5)
+sleep_btn.image = resized_image
 sleep_btn.grid(row=4,column=1,pady=(10, 15),ipadx=25)
 
 
