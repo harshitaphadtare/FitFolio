@@ -4,6 +4,7 @@ from tkinter import PhotoImage
 from ttkthemes import ThemedTk
 from tkcalendar import DateEntry
 from tkinter import ttk
+from tkinter import messagebox
 
 
 root = Tk()
@@ -17,8 +18,135 @@ root.resizable(0, 0) #fixed size of the window
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
 
+def update_record_walk():
+    update_walk = Toplevel()
+    update_walk.title("Update")
+    update_walk.geometry("300x250")
+    update_walk.resizable(0, 0)
+    steps.columnconfigure(0, weight=1)
+    steps.columnconfigure(1, weight=1)
+
+    back_img = PhotoImage(file="images/back_arrow.png")
+    resize_back = back_img.subsample(2,2)
+    back_btn = Button(update_walk,image=resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
+    back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
+
+    act_heading = Label(update_walk,text="Update Records",font=("Helvetica", 15))
+    act_heading.grid(row=1,column=0,columnspan=2,pady=(0,10))
+
+    id = Label(update_walk,text="Id: ",font=("Verdana", 10))
+    id.grid(row=2,column=0,pady=(15,0),padx=(20,5))
+    id_entry = Entry(update_walk,width=22)
+    id_entry.grid(row=2,column=1, padx=(0,40), pady=(15,0))
+
+    distance = Label(update_walk,text="Distance (Km): ",font=("Verdana", 10))
+    distance.grid(row=3,column=0,pady=(15,0),padx=(20,5))
+    distance_entry = Entry(update_walk,width=22)
+    distance_entry.grid(row=3,column=1, padx=(0,40), pady=(15,0))
+
+    time = Label(update_walk,text="Time (Hr): ",font=("Verdana", 10))
+    time.grid(row=4,column=0,pady=(10,0),padx=(20,5))
+    time_entry = Entry(update_walk,width=22)
+    time_entry.grid(row=4,column=1, padx=(0,40), pady=(15,0))
+
+    update_btn = Button(update_walk, text="Update", padx=20, pady=3,font=("Verdana", 10))
+    update_btn.grid(row=5, column=0,columnspan=2, pady=(20, 0)) 
+
+    update_walk.mainloop()
+
+def delete_record_walk():
+    delete_walk = Toplevel()
+    delete_walk.title("Update")
+    delete_walk.geometry("220x200")
+    delete_walk.resizable(0, 0)
+    steps.columnconfigure(0, weight=1)
+    steps.columnconfigure(1, weight=1)
+
+    back_img = PhotoImage(file="images/back_arrow.png")
+    resize_back = back_img.subsample(2,2)
+    back_btn = Button(delete_walk,image=resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
+    back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
+
+    act_heading = Label(delete_walk,text="Delete Record",font=("Helvetica", 15))
+    act_heading.grid(row=1,column=0,columnspan=2,pady=(0,10))
+
+    id = Label(delete_walk,text="Id: ",font=("Verdana", 10))
+    id.grid(row=2,column=0,pady=(15,0),padx=(20,5))
+    id_entry = Entry(delete_walk,width=22)
+    id_entry.grid(row=2,column=1, padx=(0,40), pady=(15,0))
+
+    update_btn = Button(delete_walk, text="Delete", padx=20, bg="#ff8383",fg="white",pady=3,font=("Verdana", 10))
+    update_btn.grid(row=5, column=0,columnspan=2, pady=(20, 0)) 
+
+    delete_walk.mainloop()
+def walking_show_record():
+
+    def on_vertical_scroll(*args):
+        canvas.yview(*args)
+
+    def on_horizontal_scroll(*args):
+        canvas.xview(*args)
+
+    steps.withdraw()
+    record_walk = Toplevel()
+    record_walk.title("Walking Records")
+    record_walk.geometry("350x450")
+    record_walk.resizable(0, 0)
+    record_walk.grid_rowconfigure(0, weight=1)
+    record_walk.grid_columnconfigure(0, weight=1)
+
+    back_img = PhotoImage(file="images/back_arrow.png")
+    resize_back = back_img.subsample(2,2)
+    back_btn = Button(record_walk,image=resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
+    back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
+
+    act_heading = Label(record_walk,text="Walking Records",font=("Helvetica", 15))
+    act_heading.grid(row=1,column=0,columnspan=2,pady=(0,20))
+    
+    data = LabelFrame(record_walk,padx=20,pady=15)
+    data.grid(row=2,column=0,columnspan=3)
+        
+    # Create a Canvas widget
+    canvas = Canvas(data)
+    canvas.grid(row=0, column=0, columnspan=3, sticky=NSEW)
+
+    vertical_scrollbar = ttk.Scrollbar(data, orient=VERTICAL, command=on_vertical_scroll)
+    vertical_scrollbar.grid(row=0, column=2, sticky=NS)
+
+    horizontal_scrollbar = ttk.Scrollbar(data, orient=HORIZONTAL, command=on_horizontal_scroll)
+    horizontal_scrollbar.grid(row=1, column=0, columnspan=3, sticky=EW)
+
+    canvas.configure(yscrollcommand=vertical_scrollbar.set, xscrollcommand=horizontal_scrollbar.set)
+
+    frame = ttk.Frame(canvas)
+    canvas.create_window((0, 0), window=frame, anchor=NW)
+
+    for i in range(20):
+        ttk.Label(frame, text=f"Label {i}").pack(pady=5)
+
+    frame.bind("<Configure>", lambda event, canvas=canvas: canvas.configure(scrollregion=canvas.bbox("all")))
+
+    vertical_scrollbar.config(command=on_vertical_scroll)
+    horizontal_scrollbar.config(command=on_horizontal_scroll)
+
+    update_btn = Button(record_walk,text="Update", padx=30, pady=3,font=("Verdana", 10),command=update_record_walk)
+    update_btn.grid(row=3,column=0, pady=(10, 15), padx=(0,20),sticky=E)
+
+    delete_btn = Button(record_walk,text="Delete", pady=3, padx=30,font=("Verdana", 10),command=delete_record_walk)
+    delete_btn.grid(row=3,column=1,sticky=W, pady=(10, 15), padx=(0,60))
+ 
+    record_walk.mainloop()
+
+def add_steps_calories_popup():
+    '''when distance and time are entered and add btn is clicked only then:
+    1) the data from the form disappers 
+    2) message box opens showing calories burnt'''
+    response = messagebox.showinfo("Calories Burnt","HURRAY!! You burnt 200 Calories")
+
+
 # on clicking walking button 
 def step_click():
+    global steps
     page1.withdraw()
     steps = Toplevel()
     steps.title("Steps")
@@ -65,17 +193,17 @@ def step_click():
     time_entry.grid(row=6,column=1, padx=(0,40), pady=(15,0))
 
     #add button
-    add_btn = Button(steps, text="Add", padx=40, pady=3,font=("Verdana", 10))
+    add_btn = Button(steps, text="Add", padx=40, pady=3,font=("Verdana", 10),command=add_steps_calories_popup)
     add_btn.grid(row=7, column=0, pady=(20, 0), sticky=E, padx=(70, 5)) 
 
     #show record btn
-    show_acc = Button(steps, text="Show record", pady=3, padx=30,font=("Verdana", 10))
+    show_acc = Button(steps, text="Show record", pady=3, padx=30,font=("Verdana", 10),command=walking_show_record)
     show_acc.grid(row=7, column=1, sticky=W, pady=(20, 0), padx=(5, 0)) 
-
 
     steps.mainloop()
 
 def activity_page():
+    root.withdraw()
     global page1
     page1 = Toplevel()
 
