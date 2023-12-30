@@ -163,46 +163,38 @@ class Activity:
            
     def walking_show_record(self):
 
-        self.step_window.withdraw()
-        
-        def on_vertical_scroll(*args):
-            self.canvas.yview(*args)
+        #step_window.withdraw()
+        self.record_walk_window = Toplevel()
+        self.record_walk_window.title("Walking Records")
+        self.record_walk_window.geometry("350x450")
+        self.record_walk_window.resizable(0, 0)
+        self.record_walk_window.grid_rowconfigure(0, weight=1)
+        self.record_walk_window.grid_columnconfigure(0, weight=1)
 
-        def on_horizontal_scroll(*args):
-            self.canvas.xview(*args)
-
-        self.master.withdraw()
-        self.record_walk = Toplevel()
-        self.record_walk.title("Walking Records")
-        self.record_walk.geometry("350x450")
-        self.record_walk.resizable(0, 0)
-        self.record_walk.grid_rowconfigure(0, weight=1)
-        self.record_walk.grid_columnconfigure(0, weight=1)
-
-        self.back_img = PhotoImage(file="images/back_arrow.png")
+        self.back_img = PhotoImage(file=r"images\back_arrow.png")
         self.resize_back = self.back_img.subsample(2,2)
-        self.back_btn = Button(self.record_walk,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.record_walk_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
         self.back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
 
-        self.act_heading = Label(self.record_walk,text="Walking Records",font=("Helvetica", 15))
+        self.act_heading = Label(self.record_walk_window,text="Walking Records",font=("Helvetica", 15))
         self.act_heading.grid(row=1,column=0,columnspan=2,pady=(0,20))
-        
-        self.data = LabelFrame(self.record_walk,padx=20,pady=15)
+    
+        self.data = LabelFrame(self.record_walk_window,padx=20,pady=15)
         self.data.grid(row=2,column=0,columnspan=3)
-            
+        
         # Create a Canvas widget
         self.canvas = Canvas(self.data)
-        self.canvas.grid(row=0, column=0, columnspan=3, sticky=NSEW)
+        self.canvas.grid(row=0, column=0, columnspan=3, sticky= NSEW)
 
-        self.vertical_scrollbar = ttk.Scrollbar(self.data, orient=VERTICAL, command=on_vertical_scroll)
+        self.vertical_scrollbar = ttk.Scrollbar(self.data, orient=VERTICAL, command=self.canvas.yview)
         self.vertical_scrollbar.grid(row=0, column=2, sticky=NS)
 
-        self.horizontal_scrollbar = ttk.Scrollbar(self.data, orient=HORIZONTAL, command=on_horizontal_scroll)
+        self.horizontal_scrollbar = ttk.Scrollbar(self.data, orient=HORIZONTAL, command=self.canvas.xview)
         self.horizontal_scrollbar.grid(row=1, column=0, columnspan=3, sticky=EW)
 
         self.canvas.configure(yscrollcommand=self.vertical_scrollbar.set, xscrollcommand=self.horizontal_scrollbar.set)
 
-        self.frame = ttk.Frame(self.canvas)
+        self.frame = ttk.Frame(self.canvas, height=200, width=100)
         self.canvas.create_window((0, 0), window=self.frame, anchor=NW)
 
         for i in range(20):
@@ -210,16 +202,15 @@ class Activity:
 
         self.frame.bind("<Configure>", lambda event, canvas=self.canvas: canvas.configure(scrollregion=canvas.bbox("all")))
 
-        self.vertical_scrollbar.config(command=on_vertical_scroll)
-        self.horizontal_scrollbar.config(command=on_horizontal_scroll)
-
-         #update btn
-        self.update_btn = Button(self.record_walk,text="Update", padx=30, pady=3,font=("Verdana", 10),command=self.update_record_walk)
+        #update btn
+        self.update_btn = Button(self.record_walk_window,text="Update", padx=30, pady=3,font=("Verdana", 10),command=self.update_record_walk)
         self.update_btn.grid(row=3,column=0, pady=(10, 15), padx=(0,20),sticky=E)
 
         #delete btn
-        self.delete_btn = Button(self.record_walk,text="Delete", pady=3, padx=30,font=("Verdana", 10),command=self.delete_record_walk)
+        self.delete_btn = Button(self.record_walk_window,text="Delete", pady=3, padx=30,font=("Verdana", 10),command=self.delete_record_walk)
         self.delete_btn.grid(row=3,column=1,sticky=W, pady=(10, 15), padx=(0,60))
+ 
+        self.record_walk_window.mainloop()
 
     def delete_record_walk(self):
         self.delete_walk_window = Toplevel()
