@@ -1,76 +1,94 @@
 # import tkinter as tk
-# from tkinter import ttk
 
-# def on_scroll(*args):
-#     canvas.yview(*args)
+# class MyGUI:
+#     def __init__(self, master):
+#         self.master = master
+#         master.title("My GUI")
 
+#         self.label = tk.Label(master, text="Hello, Tkinter!")
+#         self.label.pack()
+
+#         self.button = tk.Button(master, text="Click Me", command=self.on_button_click)
+#         self.button.pack()
+
+#     def on_button_click(self):
+#         print("Button clicked!")
+
+# # Create the main window
 # root = tk.Tk()
-# root.title("Scrollable Frame Example")
 
-# # Create a Canvas widget
-# canvas = tk.Canvas(root)
-# canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+# # Instantiate the MyGUI class
+# my_gui = MyGUI(root)
 
-# # Create a Scrollbar widget and attach it to the Canvas
-# scrollbar = ttk.Scrollbar(root, orient=tk.VERTICAL, command=canvas.yview)
-# scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-# # Configure the Canvas to use the Scrollbar
-# canvas.configure(yscrollcommand=scrollbar.set)
-
-# # Create a frame inside the Canvas
-# frame = ttk.Frame(canvas)
-# canvas.create_window((0, 0), window=frame, anchor=tk.NW)
-
-# # Add some widgets to the scrollable frame
-# for i in range(20):
-#     ttk.Label(frame, text=f"Label {i}").pack(pady=5)
-
-# # Bind the Canvas to the frame size
-# frame.bind("<Configure>", lambda event, canvas=canvas: canvas.configure(scrollregion=canvas.bbox("all")))
-
-# # Bind the Scrollbar to the Canvas
-# scrollbar.config(command=on_scroll)
-
+# # Start the Tkinter event loop
 # root.mainloop()
 
 
-import tkinter as tk
-from tkinter import ttk
 
-def on_scroll(*args):
-    canvas.yview(*args)
 
-root = tk.Tk()
-root.title("Scrollable Frame Example")
 
-# Create a Canvas widget
-canvas = tk.Canvas(root)
-canvas.grid(row=0, column=0, sticky=tk.NSEW)
 
-# Create a Scrollbar widget and attach it to the Canvas
-scrollbar = ttk.Scrollbar(root, orient=tk.VERTICAL, command=canvas.yview)
-scrollbar.grid(row=0, column=1, sticky=tk.NS)
 
-# Configure the Canvas to use the Scrollbar
-canvas.configure(yscrollcommand=scrollbar.set)
+# ####################################
+# # back and forward
+# from tkinter import *
 
-# Create a frame inside the Canvas
-frame = ttk.Frame(canvas)
-canvas.create_window((0, 0), window=frame, anchor=tk.NW)
+# class Page:
+#     def __init__(self, master, name):
+#         self.master = master
+#         self.frame = Frame(master)
+#         self.name = name
+#         self.label = Label(self.frame, text=name)
+#         self.label.pack(pady=10)
 
-# Add some widgets to the scrollable frame
-for i in range(20):
-    ttk.Label(frame, text=f"Label {i}").pack(pady=5)
+#     def show(self):
+#         self.frame.pack(fill="both", expand=True)
 
-# Bind the Canvas to the frame size
-frame.bind("<Configure>", lambda event, canvas=canvas: canvas.configure(scrollregion=canvas.bbox("all")))
+#     def hide(self):
+#         self.frame.pack_forget()
 
-# Bind the Scrollbar to the Canvas
-scrollbar.config(command=on_scroll)
+# class MyApp:
+#     def __init__(self, master):
+#         self.master = master
+#         self.master.title('Navigation Example')
 
-# Set row and column weights for resizing
-root.grid_rowconfigure(0, weight=1)
-root.grid_columnconfigure(0, weight=1)
+#         self.pages = []
+#         self.current_page_index = 0
 
-root.mainloop()
+#         self.page1 = Page(master, "Page 1")
+#         self.pages.append(self.page1)
+
+#         self.page2 = Page(master, "Page 2")
+#         self.pages.append(self.page2)
+
+#         self.page3 = Page(master, "Page 3")
+#         self.pages.append(self.page3)
+
+#         self.forward_button = Button(master, text="Forward", command=self.show_next_page)
+#         self.forward_button.pack(side=RIGHT)
+
+#         self.backward_button = Button(master, text="Backward", command=self.show_previous_page)
+#         self.backward_button.pack(side=LEFT)
+
+#         self.show_current_page()
+
+#     def show_next_page(self):
+#         if self.current_page_index < len(self.pages) - 1:
+#             self.pages[self.current_page_index].hide()
+#             self.current_page_index += 1
+#             self.show_current_page()
+
+#     def show_previous_page(self):
+#         if self.current_page_index > 0:
+#             self.pages[self.current_page_index].hide()
+#             self.current_page_index -= 1
+#             self.show_current_page()
+
+#     def show_current_page(self):
+#         self.pages[self.current_page_index].show()
+
+# if __name__ == "__main__":
+#     root = Tk()
+#     app = MyApp(root)
+#     root.mainloop()
+
