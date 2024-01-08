@@ -32,7 +32,7 @@ class Sleep:
         self.sleep_window.columnconfigure(0, weight=1)
         self.sleep_window.columnconfigure(1, weight=1)
 
-        self.back_btn = Button(self.sleep_window,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.sleep_window,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0,command=lambda:[root.deiconify(),self.sleep_window.destroy()])
         self.back_btn.grid(row=0, column=0, padx=5,sticky=NW)
 
         self.act_heading = Label(self.sleep_window,text="Sleep Tracking",font=("Helvetica", 25))
@@ -91,7 +91,7 @@ class Sleep:
         self.record_sleep_window.grid_rowconfigure(0, weight=1)
         self.record_sleep_window.grid_columnconfigure(0, weight=1)
 
-        self.back_btn = Button(self.record_sleep_window,image=self.resize_back,command=lambda: self.record_sleep_window.destroy(),padx=10,pady=5,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.record_sleep_window,image=self.resize_back,command=lambda: [self.record_sleep_window.destroy(),self.sleep_window.deiconify()],padx=10,pady=5,relief="flat", borderwidth=0)
         self.back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
 
         self.act_heading = Label(self.record_sleep_window,text="Sleep Records",font=("Helvetica", 15))
@@ -230,7 +230,7 @@ class Body_Measurement:
         self.bodym_window.columnconfigure(0, weight=1)
         self.bodym_window.columnconfigure(1, weight=1)
 
-        self.back_btn = Button(self.bodym_window,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.bodym_window,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0,command=lambda:[root.deiconify(),self.bodym_window.destroy()])
         self.back_btn.grid(row=0, column=0, padx=5,sticky=NW)
 
         self.act_heading = Label(self.bodym_window,text="Body Measurements",font=("Helvetica", 25))
@@ -310,7 +310,7 @@ class Body_Measurement:
 
     def body_show_record(self):
 
-        #step_window.withdraw()
+        self.bodym_window.withdraw()
         self.record_body_window = Toplevel()
         self.record_body_window.title("BMI Records")
         self.record_body_window.geometry("350x450")
@@ -318,7 +318,7 @@ class Body_Measurement:
         self.record_body_window.grid_rowconfigure(0, weight=1)
         self.record_body_window.grid_columnconfigure(0, weight=1)
 
-        self.back_btn = Button(self.record_body_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.record_body_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0,command=lambda:[self.bodym_window.deiconify(),self.record_body_window.destroy()])
         self.back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
 
         self.act_heading = Label(self.record_body_window,text="BMI Records",font=("Helvetica", 15))
@@ -433,7 +433,7 @@ class Mindfulness:
         #back button
         self.back_img = PhotoImage(file=r"images/back_arrow.png")
         self.resize_back = self.back_img.subsample(2,2)
-        self.back_btn = Button(self.master,image=self.resize_back ,padx=10,pady=10,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.master,image=self.resize_back ,padx=10,pady=10,relief="flat", borderwidth=0,command=lambda:[root.deiconify(),self.master.destroy()])
         self.back_btn.grid(row=0, column=0, padx=5,sticky=NW)
 
         #title
@@ -498,7 +498,7 @@ class Mindfulness:
 
         self.back_img = PhotoImage(file=r"images\back_arrow.png")
         self.resize_back = self.back_img.subsample(2,2)
-        self.back_btn = Button(self.record_walk_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.record_walk_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0,command=lambda:[self.master.deiconify(),self.record_walk_window.destroy()])
         self.back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
 
         self.act_heading = Label(self.record_walk_window,text="Mindfulness Records",font=("Helvetica", 15))
@@ -618,7 +618,7 @@ class Activity:
         self.back_img = PhotoImage(file="images/back_arrow.png")
         self.resize_back = self.back_img.subsample(2,2)
 
-        self.back_btn = Button(self.master,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.master,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0,command=lambda:[root.deiconify(),self.master.destroy()])
         self.back_btn.grid(row=0, column=0, padx=5,sticky=NW)
 
         self.act_heading = Label(self.master,text="Activity",font=("Helvetica", 25))
@@ -666,7 +666,7 @@ class Activity:
         self.step_window.columnconfigure(0, weight=1)
         self.step_window.columnconfigure(1, weight=1)
 
-        self.back_btn = Button(self.step_window,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.step_window,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0,command=lambda:[self.master.deiconify(),self.step_window.destroy()])
         self.back_btn.grid(row=0, column=0, padx=5,sticky=NW)
 
         self.act_heading = Label(self.step_window,text="Cardio",font=("Helvetica", 25))
@@ -744,7 +744,7 @@ class Activity:
         self.record_walk_window.grid_columnconfigure(0, weight=1)
 
         
-        self.back_btn = Button(self.record_walk_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.record_walk_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0,command=lambda:[self.step_window.deiconify(),self.record_walk_window.destroy()])
         self.back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
 
         self.act_heading = Label(self.record_walk_window,text="Walking Records",font=("Helvetica", 15))
@@ -853,7 +853,7 @@ class Activity:
         self.step_window.columnconfigure(0, weight=1)
         self.step_window.columnconfigure(1, weight=1)
 
-        self.back_btn = Button(self.step_window,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.step_window,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0,command=lambda:[self.master.deiconify(),self.step_window.destroy()])
         self.back_btn.grid(row=0, column=0, padx=5,sticky=NW)
 
         self.act_heading = Label(self.step_window,text="Cycling",font=("Helvetica", 25))
@@ -930,7 +930,7 @@ class Activity:
         self.record_walk_window.grid_columnconfigure(0, weight=1)
 
         
-        self.back_btn = Button(self.record_walk_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
+        self.back_btn = Button(self.record_walk_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0,command=lambda:[self.step_window.deiconify(),self.record_walk_window.destroy()])
         self.back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
 
         self.act_heading = Label(self.record_walk_window,text="Walking Records",font=("Helvetica", 15))
