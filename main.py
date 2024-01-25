@@ -19,14 +19,15 @@ db = mysql.connector.connect(
 mycur = db.cursor()
 
 root = Tk()
-root.title("FitFolio")
+root.title("FitFolio Login")
 icon_image = PhotoImage(file="images/heart.png")
 root.iconphoto(True, icon_image) 
-root.geometry("450x330")
+root.geometry("300x200")
 root.resizable(0, 0) #fixed size of the window
 # configuring the rows and columns of the grid
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
+
 
 # sleep page
 class Sleep:
@@ -221,6 +222,7 @@ class Sleep:
         self.ok_btn.pack()
         
 def sleep_page():
+    top.withdraw()
     sleep_window = Toplevel(root)
     app = Sleep(sleep_window)
 
@@ -426,7 +428,7 @@ class Body_Measurement:
         self.delete_body_window.mainloop()
 
 def body_page():
-    root.withdraw()
+    top.withdraw()
     body_window = Toplevel(root)
     app = Body_Measurement(body_window) 
 
@@ -612,7 +614,7 @@ class Mindfulness:
         self.update_walk.mainloop()
 
 def mindful_page():
-    root.withdraw()
+    top.withdraw()
     mindful_window = Toplevel(root)
     app = Mindfulness(mindful_window) 
 
@@ -628,7 +630,7 @@ class Activity:
         self.back_img = PhotoImage(file="images/back_arrow.png")
         self.resize_back = self.back_img.subsample(2,2)
 
-        self.back_btn = Button(self.master,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0,command=lambda:[root.deiconify(),self.master.destroy()])
+        self.back_btn = Button(self.master,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0,command=lambda:[top.deiconify(),self.master.destroy()])
         self.back_btn.grid(row=0, column=0, padx=5,sticky=NW)
 
         self.act_heading = Label(self.master,text="Activity",font=("Helvetica", 25))
@@ -734,10 +736,6 @@ class Activity:
 
     def add_steps_calories_popup(self):
         
-        self.weight_entry.delete(0,END)
-        self.time_entry.delete(0,END)
-        self.distance_entry.delete(0,END)
-
         dist = float(self.distance_entry.get())
         time = float(self.time_entry.get())
         weight = float(self.weight_entry.get())
@@ -751,11 +749,29 @@ class Activity:
             else:
                 met=5
             
-            calories = (met * weight * time)/200
-            messagebox.showinfo("Calories Burnt",f"HURRAY!! You burnt {calories} Calories")
+            cal = (met * weight * time)*10/2
+            calories = messagebox.askyesno("Calories Burnt",f"HURRAY!! You burnt {cal} Calories, Would you like to record this?")
+
+            if calories:
+                sql = "INSERT INTO cardio (username,distance,date,time,calories,weight) VALUES (%s, %s, CURDATE(),%s, %s,%s)"
+                val = (username_login,dist,time,cal,weight)
+                mycur.execute(sql, val)
+                messagebox.showinfo("Record","Record is added Succesfully!")
+
+                db.commit()
+
+            self.weight_entry.delete(0,END)
+            self.time_entry.delete(0,END)
+            self.distance_entry.delete(0,END)
+
 
         else:
             messagebox.showerror("Invalid value","Please enter valid distance,time and weight")
+            
+            self.weight_entry.delete(0,END)
+            self.time_entry.delete(0,END)
+            self.distance_entry.delete(0,END)
+
 
     def walking_show_record(self):
 
@@ -772,31 +788,38 @@ class Activity:
         self.back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
 
         self.act_heading = Label(self.record_walk_window,text="Walking Records",font=("Helvetica", 15))
-        self.act_heading.grid(row=1,column=0,columnspan=2,pady=(0,20))
+        self.act_heading.grid(row=1,column=0,columnspan=2,pady=(0,60))
     
         self.data = LabelFrame(self.record_walk_window,padx=20,pady=15)
         self.data.grid(row=2,column=0,columnspan=3)
         
-        # Create a Canvas widget
-        self.canvas = Canvas(self.data)
-        self.canvas.grid(row=0, column=0, columnspan=3, sticky= NSEW)
+        # Create a Treeview widget
+        self.tree = ttk.Treeview(self.data, columns=("ID", "Date", "Distance", "Time", "Calories", "Weight"), height=10)
+        self.tree.heading("ID", text="ID")
+        self.tree.heading("Date", text="Date")
+        self.tree.heading("Distance", text="Distance")
+        self.tree.heading("Time", text="Time")
+        self.tree.heading("Calories", text="Calories")
+        self.tree.heading("Weight", text="Weight")
 
-        self.vertical_scrollbar = ttk.Scrollbar(self.data, orient=VERTICAL, command=self.canvas.yview)
-        self.vertical_scrollbar.grid(row=0, column=2, sticky=NS)
+        # Set column widths
+        self.tree.column("ID", width=50)
+        self.tree.column("Date", width=100)
+        self.tree.column("Distance", width=100)
+        self.tree.column("Time", width=100)
+        self.tree.column("Calories", width=100)
+        self.tree.column("Weight", width=100)
+        
+        # Add a vertical scrollbar
+        vsb = ttk.Scrollbar(self.data, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=vsb.set)
 
-        self.horizontal_scrollbar = ttk.Scrollbar(self.data, orient=HORIZONTAL, command=self.canvas.xview)
-        self.horizontal_scrollbar.grid(row=1, column=0, columnspan=3, sticky=EW)
+        # Pack the Treeview and scrollbar
+        self.tree.pack(side="left", fill=BOTH)
+        vsb.pack(side="right", fill=Y)
 
-        self.canvas.configure(yscrollcommand=self.vertical_scrollbar.set, xscrollcommand=self.horizontal_scrollbar.set)
-
-        self.frame = ttk.Frame(self.canvas, height=200, width=100)
-        self.canvas.create_window((0, 0), window=self.frame, anchor=NW)
-
-        for i in range(20):
-            ttk.Label(self.frame, text=f"Label {i}").pack(pady=5)
-
-        self.frame.bind("<Configure>", lambda event, canvas=self.canvas: canvas.configure(scrollregion=canvas.bbox("all")))
-
+        # Call the populate_treeview method
+        self.populate_treeview(username_login)
 
         self.update_btn = Button(self.record_walk_window,text="Update", padx=30, pady=3,font=("Verdana", 10),command=self.update_record_walk)
         self.update_btn.grid(row=3,column=0, pady=(10, 15), padx=(0,20),sticky=E)
@@ -806,9 +829,43 @@ class Activity:
  
         self.record_walk_window.mainloop()
 
+
+    def populate_treeview(self, username):
+        sql = "SELECT id, date, distance, time, calories, weight FROM cardio WHERE username = %s"
+        val = (username,)
+        mycur.execute(sql, val)
+        rows = mycur.fetchall()
+
+        for row in rows:
+            self.tree.insert("", "end", values=row)
+
+
+    def delete_sql(self):
+        self.ans = messagebox.askyesno("Delete Record","Are you sure you want to Delete Your Record?? ")
+        if self.ans: 
+            self.sql = "DELETE FROM cardio WHERE username = %s AND id = %s"
+            self.val = (username_login, self.id_entry.get())
+
+            try:
+                mycur.execute(self.sql, self.val)
+                db.commit()
+                messagebox.showinfo("Delete Record","Succesfully Deleted the Record!")
+                self.id_entry.delete(0,END)
+                self.delete_walk_window.withdraw()
+
+            except mysql.connector.Error as err:
+                messagebox.showinfo("Delete Record","Enter Right ID!")
+    
+
+        else:
+            delete_walk_window.withdraw()
+
     def delete_record_walk(self):
+        global delete_walk_window
+        global id_entry
+
         self.delete_walk_window = Toplevel()
-        self.delete_walk_window.title("Update")
+        self.delete_walk_window.title("Delete")
         self.delete_walk_window.geometry("220x200")
         self.delete_walk_window.resizable(0, 0)
 
@@ -826,10 +883,10 @@ class Activity:
         self.id_entry = Entry(self.delete_walk_window,width=22)
         self.id_entry.grid(row=2,column=1, padx=(0,40), pady=(15,0))
 
-        self.update_btn = Button(self.delete_walk_window, text="Delete", padx=20, bg="#ff8383",fg="white",pady=3,font=("Verdana", 10))
-        self.update_btn.grid(row=5, column=0,columnspan=2, pady=(20, 0)) 
+        self.delete_btn = Button(self.delete_walk_window, text="Delete", padx=20, bg="#ff8383",fg="white",pady=3,font=("Verdana", 10),command=self.delete_sql)
+        self.delete_btn.grid(row=5, column=0,columnspan=2, pady=(20, 0)) 
 
-        self.delete_walk_window.mainloop()
+                
 
     def update_record_walk(self):
         self.update_walk_window = Toplevel()
@@ -1053,12 +1110,77 @@ class Activity:
         self.update_walk_window.mainloop()
 
 def activity_page():
-    root.withdraw()
+    top.withdraw()
     activity_window = Toplevel(root)
     app = Activity(activity_window)
 
-#signup page
-    
+
+def login_verify():
+    global username_login 
+    global password
+    global top
+    username_login= username_entry.get()
+    password = password_entry.get()
+    sql = "select * from users where username = %s and password = %s"
+    mycur.execute(sql,[(username_login),(password)])
+    results = mycur.fetchall()
+    if results:
+        for i in results:
+            messagebox.showinfo("Logged in", f"Welcome {username_login}!")
+            root.withdraw()
+            home_page()
+            break
+    else:
+        root.deiconify()
+        messagebox.showerror("Error","Please fill out both fields correctly.")
+
+def home_page():
+
+    global top
+    top = Toplevel()
+    top.title("Home")
+    top.geometry("450x330")
+    top.resizable(0, 0)
+    top.columnconfigure(0, weight=1)
+    top.columnconfigure(1, weight=1)
+
+    image = Image.open("images/user.png")  
+    photo = ImageTk.PhotoImage(image)
+    user_btn = Button(top,image=photo,relief="flat", borderwidth=0,command=delete_or_logout)
+    user_btn.grid(row=0,column=1, sticky=E, padx=5, pady=5,ipadx=10,ipady=10)
+    user_btn.image = photo # Setting the image as a reference to prevent it from being garbage collected
+
+    label = Label(top,text="Track Yourself Now!!", font=("Helvetica", 20),pady=10)
+    label.grid(row=1,column=0,columnspan=2)
+
+    # activity button
+    activity_image = PhotoImage(file='images/activity.png')
+    resized_image = activity_image.subsample(2, 2)
+    activity_btn = Button(top, text=" Activity ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5,command=activity_page)
+    activity_btn.image = resized_image
+    activity_btn.grid(row=3,column=0, pady=(20,10),ipadx=15)
+
+    # mindfullness button
+    mindful_image = PhotoImage(file='images/mindfulness.png')
+    resized_image = mindful_image.subsample(2, 2)
+    mindful_btn = Button(top, text=" Mindfulness ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5,command=mindful_page)
+    mindful_btn.image = resized_image
+    mindful_btn.grid(row=3,column=1,pady=(20, 15))
+
+    # body button
+    body_image = PhotoImage(file='images/body.png')
+    resized_image = body_image.subsample(2, 2)
+    body_btn = Button(top, text=" Body ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5,command=Body_Measurement)
+    body_btn.image = resized_image
+    body_btn.grid(row=4,column=0,pady=(10, 15),ipadx=25)
+
+
+    sleep_image = PhotoImage(file='images/sleep.png')
+    resized_image = sleep_image.subsample(2, 2)
+    sleep_btn = Button(top, text=" Sleep ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5,command=sleep_page) 
+    sleep_btn.image = resized_image
+    sleep_btn.grid(row=4,column=1,pady=(10, 15),ipadx=25)
+
 def create_user():
     name_info = fullname_entry.get()
     birthday_info = dob_entry.get()
@@ -1078,10 +1200,10 @@ def create_user():
         create_acc_window.withdraw()
         messagebox.showinfo("Account Created", "Your account has been created successfully.")
     
-    user_click()
+    home_page()
 
 def create_acc_click():
-    top.withdraw()
+    root.withdraw()
     global create_acc_window
     create_acc_window = Toplevel()
     create_acc_window.title("Sign Up")
@@ -1142,11 +1264,7 @@ def create_acc_click():
     signup_btn = Button(create_acc_window,text="Sign up",padx=10,pady=5,command=create_user)
     signup_btn.grid(row=8,column=0,columnspan=2, padx=5, pady=10)
 
-
-# login page opens when user button is clicked
-    
 def delete_acc():
-    username = username_entry.get()
     result = messagebox.askyesno("Delete Account", "Are you sure you want to delete your account?")
     
     if result:
@@ -1154,112 +1272,67 @@ def delete_acc():
         mycur.execute('DELETE FROM users WHERE username = %s',(username,))
         db.commit()
         messagebox.showinfo("Account Deleted", "Your account has been deleted.")
-        image = Image.open("images/user.png")  
-        photo = ImageTk.PhotoImage(image)
-        user_btn = Button(root,image=photo,command=user_click ,relief="flat", borderwidth=0)
-        user_btn.grid(row=0,column=1, sticky=E, padx=5, pady=5,ipadx=10,ipady=10)
-        user_btn.image = photo # Setting the image as a reference to prevent it from being garbage collected
-        top.destroy()  
+        acc.withdraw()  
+        top.withdraw()
+        root.deiconify()
+        username_entry.delete(0,END)
+        password_entry.delete(0,END)
 
-def login_verify():
-    username = username_entry.get()
-    password = password_entry.get()
-    sql = "select * from users where username = %s and password = %s"
-    mycur.execute(sql,[(username),(password)])
-    results = mycur.fetchall()
-    if results:
-        for i in results:
-            messagebox.showinfo("Logged in", f"Welcome {username}!")
-            new_image = Image.open("images/user.png")  
-            new_photo = ImageTk.PhotoImage(new_image)
-            new_user_btn = Button(root,image=new_photo,relief="flat",borderwidth=0,command=delete_acc)
-            new_user_btn.grid(row=0,column=1, sticky=E, padx=5, pady=5,ipadx=10,ipady=10)
-            new_user_btn.new_image = new_photo
-            top.withdraw()
-            break
     else:
-        top.deiconify()
-        messagebox.showerror("Error","Please fill out both fields correctly.")
-       
-def user_click():
-   global top
-   top = Toplevel()
-   top.title("Login")
-   top.geometry("300x200")
-   top.resizable(0, 0)
-   top.columnconfigure(0, weight=1)
-   top.columnconfigure(1, weight=1)
-   global username_entry
-   global password_entry
+        acc.withdraw()
 
-   label_top = Label(top,text="Welcome to FitFolio!!",font=("Helvetica", 15),pady=20)
-   label_top.grid(row=1,column=0,columnspan=2)
+def logout_acc():
+    acc.withdraw()
+    top.withdraw()
+    root.deiconify()
+    username_entry.delete(0,END)
+    password_entry.delete(0,END)
+      
+def delete_or_logout():
+    # username = username_entry.get()
+    global acc
+    acc = Toplevel()
+    acc.title("Delete or Logout")
+    acc.geometry("300x170")
+    acc.resizable(0, 0)
+    acc.columnconfigure(0, weight=1)
+    acc.columnconfigure(1, weight=1)
 
-   #username
-   username = Label(top,text="Username: ")
-   username.grid(row=2,column=0)
-   username_entry = Entry(top,width=30)
-   username_entry.grid(row=2,column=1,sticky=W, padx=5, pady=5)
+    label = Label(acc,text="Do you want to DELETE or",font=("Verdana", 12))
+    label.grid(row=0,column=0,columnspan=2,pady=(20,5))
 
-   #password
-   password = Label(top,text="Password: ")
-   password.grid(row=3,column=0)
-   password_entry = Entry(top,width=30, show='*')
-   password_entry.grid(row=3,column=1,sticky=W, padx=5, pady=5)
+    label2 = Label(acc,text="LOGOUT from your Account? ",font=("Verdana", 12))
+    label2.grid(row=1,column=0,columnspan=2,pady=(0,20))
 
-   #login button
-   login_btn = Button(top,text="Login",padx=10,pady=3,command=login_verify)
-   login_btn.grid(row=4,column=0,columnspan=2,pady=(10,0),padx=20)
+    btn_delete = Button(acc,text="Delete Account",bg="red",fg="white",padx=10,pady=3,command=delete_acc)
+    btn_delete.grid(row=2,column=0,columnspan=2)
 
-   #create button
-   create_acc_text = "Create Account"
-   create_acc = Button(top,text=create_acc_text,pady=3,relief="flat", borderwidth=0,underline=len(create_acc_text),command=create_acc_click)
-   create_acc.grid(row=5,columnspan=2,column=0)
+    btn_logout = Button(acc,text="Logout",padx=10,relief="flat", borderwidth=0,pady=3,command=logout_acc)
+    btn_logout.grid(row=3,column=0,columnspan=2)
 
 
+label_root = Label(root,text="Welcome to FitFolio!!",font=("Helvetica", 15),pady=20)
+label_root.grid(row=1,column=0,columnspan=2)
 
-########## main page
-#user button
-image = Image.open("images/user.png")  
-photo = ImageTk.PhotoImage(image)
-user_btn = Button(root,image=photo,command=user_click ,relief="flat", borderwidth=0)
-user_btn.grid(row=0,column=1, sticky=E, padx=5, pady=5,ipadx=10,ipady=10)
-user_btn.image = photo # Setting the image as a reference to prevent it from being garbage collected
+#username
+username = Label(root,text="Username: ")
+username.grid(row=2,column=0)
+username_entry = Entry(root,width=30)
+username_entry.grid(row=2,column=1,sticky=W, padx=5, pady=5)
 
-label = Label(root,text="Track Yourself Now!!", font=("Helvetica", 20),pady=10)
-label.grid(row=1,column=0,columnspan=2)
+#password
+password = Label(root,text="Password: ")
+password.grid(row=3,column=0)
+password_entry = Entry(root,width=30, show='*')
+password_entry.grid(row=3,column=1,sticky=W, padx=5, pady=5)
 
+#login button
+login_btn = Button(root,text="Login",padx=10,pady=3,command=login_verify)
+login_btn.grid(row=4,column=0,columnspan=2,pady=(10,0),padx=20)
 
-# activity button
-activity_image = PhotoImage(file='images/activity.png')
-resized_image = activity_image.subsample(2, 2)
-activity_btn = Button(root, text=" Activity ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5,command=activity_page)
-activity_btn.image = resized_image
-activity_btn.grid(row=3,column=0, pady=(20,10),ipadx=15)
-
-# mindfullness button
-mindful_image = PhotoImage(file='images/mindfulness.png')
-resized_image = mindful_image.subsample(2, 2)
-mindful_btn = Button(root, text=" Mindfulness ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5,command=mindful_page)
-mindful_btn.image = resized_image
-mindful_btn.grid(row=3,column=1,pady=(20, 15))
-
-# body button
-body_image = PhotoImage(file='images/body.png')
-resized_image = body_image.subsample(2, 2)
-body_btn = Button(root, text=" Body ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5,command=Body_Measurement)
-body_btn.image = resized_image
-body_btn.grid(row=4,column=0,pady=(10, 15),ipadx=25)
-
-
-sleep_image = PhotoImage(file='images/sleep.png')
-resized_image = sleep_image.subsample(2, 2)
-sleep_btn = Button(root, text=" Sleep ", image=resized_image,compound=LEFT, font=("Verdana", 12),padx=5,pady=5,command=sleep_page) 
-sleep_btn.image = resized_image
-sleep_btn.grid(row=4,column=1,pady=(10, 15),ipadx=25)
-
+#create button
+create_acc_text = "Create Account"
+create_acc = Button(root,text=create_acc_text,pady=3,relief="flat", borderwidth=0,underline=len(create_acc_text),command=create_acc_click)
+create_acc.grid(row=5,columnspan=2,column=0)
 
 root.mainloop()
-
-
-
