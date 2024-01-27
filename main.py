@@ -7,6 +7,9 @@ from tkinter import ttk
 from tkinter import messagebox
 from tktimepicker import AnalogPicker, AnalogThemes, constants 
 import mysql.connector
+from datetime import datetime, timedelta
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
 
 db = mysql.connector.connect(
     host = "localhost",
@@ -668,6 +671,7 @@ class Activity:
             self.frame.bind('<Button-1>', self.activity[1])
 
 ############# walking functons #############
+
     def step_click(self, event):
         self.master.withdraw()
         self.step_window = Toplevel()
@@ -678,8 +682,10 @@ class Activity:
         global time_entry
         global weight_entry
 
+        self.step_window.rowconfigure(3, weight=1)
         self.step_window.columnconfigure(0, weight=1)
         self.step_window.columnconfigure(1, weight=1)
+
 
         self.back_btn = Button(self.step_window,image=self.resize_back,padx=10,pady=10,relief="flat", borderwidth=0,command=lambda:[self.master.deiconify(),self.step_window.destroy()])
         self.back_btn.grid(row=0, column=0, padx=5,sticky=NW)
@@ -688,51 +694,43 @@ class Activity:
         self.act_heading.grid(row=1,column=0,columnspan=2,pady=(0,10))
 
         # dropdown for timeperiod
-        self.options = ["3-Days","Weekly","Month","Yearly"]
+        self.options = ["3-Days","Weekly","Monthly","Yearly"]
         self.clicked = StringVar()
         self.clicked.set(self.options[0])
         self.drop = OptionMenu(self.step_window,self.clicked,*self.options)
         self.drop.grid(row=2,column=0,columnspan=2)
 
         #graph section
-        self.frame_step = LabelFrame(self.step_window,padx=200,pady=100)
-        self.frame_step.grid(row=3,column=0,columnspan=2,pady=(10,0))
+        self.frame_step = LabelFrame(self.step_window, padx=15, pady=15)
+        self.frame_step.grid(row=3,column=0,columnspan=2,pady=(5,0))
 
-        self.label_step = Label(self.frame_step,text="Graph")
-        self.label_step.grid(row=3,column=0,)
-
+        #GRAPH 
 
         self.label_step = Label(self.step_window,text="Track Calories you Burnt Today!!",font=("Verdana", 13),fg="red")
-        self.label_step.grid(row=4,column=0,columnspan=2,pady=(10,2))
-
+        self.label_step.grid(row=4,column=0,columnspan=2,pady=(5,2))
         #distance
         self.distance = Label(self.step_window,text="Distance (Km): ",font=("Verdana", 10))
         self.distance.grid(row=5,column=0,pady=(15,0),padx=(20,5),sticky=E)
         self.distance_entry = Entry(self.step_window,width=35)
         self.distance_entry.grid(row=5,column=1, padx=(0,40), pady=(15,0))
-
         #time
         self.time = Label(self.step_window,text="Time (Hr): ",font=("Verdana", 10))
         self.time.grid(row=6,column=0,pady=(10,0),padx=(20,5),sticky=E)
         self.time_entry = Entry(self.step_window,width=35)
         self.time_entry.grid(row=6,column=1, padx=(0,40), pady=(15,0))
-
         #weight
         self.weight = Label(self.step_window,text="Weight (Kg): ",font=("Verdana", 10))
         self.weight.grid(row=7,column=0,pady=(10,0),padx=(20,5),sticky=E)
         self.weight_entry = Entry(self.step_window,width=35)
         self.weight_entry.grid(row=7,column=1, padx=(0,40), pady=(15,0))
-
         #add button
         self.add_btn = Button(self.step_window, text="Track", padx=40, pady=3,font=("Verdana", 10),command=self.add_steps_calories_popup)
-        self.add_btn.grid(row=8, column=0, pady=(20, 0), sticky=E, padx=(70, 5)) 
-
+        self.add_btn.grid(row=8, column=0, pady=(15, 0), sticky=E, padx=(70, 5)) 
         #show record btn
         self.show_acc = Button(self.step_window, text="Show record", pady=3, padx=30,font=("Verdana", 10),command=self.walking_show_record)
-        self.show_acc.grid(row=8, column=1, sticky=W, pady=(20, 0), padx=(5, 0)) 
-
+        self.show_acc.grid(row=8, column=1, sticky=W, pady=(15, 0), padx=(5, 0)) 
         self.step_window.mainloop()
-    
+        
 
     def add_steps_calories_popup(self):
         
@@ -772,7 +770,6 @@ class Activity:
             self.time_entry.delete(0,END)
             self.distance_entry.delete(0,END)
 
-
     def walking_show_record(self):
 
         self.step_window.withdraw()
@@ -788,13 +785,14 @@ class Activity:
         self.back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
 
         self.act_heading = Label(self.record_walk_window,text="Walking Records",font=("Helvetica", 15))
-        self.act_heading.grid(row=1,column=0,columnspan=2,pady=(0,60))
+        self.act_heading.grid(row=1,column=0,columnspan=2)
     
-        self.data = LabelFrame(self.record_walk_window,padx=20,pady=15)
+        self.data = LabelFrame(self.record_walk_window,padx=20,pady=5)
         self.data.grid(row=2,column=0,columnspan=3)
         
         # Create a Treeview widget
-        self.tree = ttk.Treeview(self.data, columns=("ID", "Date", "Distance", "Time", "Calories", "Weight"), height=10)
+        self.tree = ttk.Treeview(self.data, columns=("ID", "Date", "Distance", "Time", "Calories", "Weight"), height=14)
+        self.tree.heading("#0", text="")
         self.tree.heading("ID", text="ID")
         self.tree.heading("Date", text="Date")
         self.tree.heading("Distance", text="Distance")
@@ -803,6 +801,7 @@ class Activity:
         self.tree.heading("Weight", text="Weight")
 
         # Set column widths
+        self.tree.column("#0", width=0, stretch=NO)
         self.tree.column("ID", width=50)
         self.tree.column("Date", width=100)
         self.tree.column("Distance", width=100)
@@ -829,7 +828,6 @@ class Activity:
  
         self.record_walk_window.mainloop()
 
-
     def populate_treeview(self, username):
         sql = "SELECT id, date, distance, time, calories, weight FROM cardio WHERE username = %s"
         val = (username,)
@@ -838,7 +836,6 @@ class Activity:
 
         for row in rows:
             self.tree.insert("", "end", values=row)
-
 
     def delete_sql(self):
         self.ans = messagebox.askyesno("Delete Record","Are you sure you want to Delete Your Record?? ")
@@ -872,11 +869,11 @@ class Activity:
         self.step_window.columnconfigure(0, weight=1)
         self.step_window.columnconfigure(1, weight=1)
 
-        self.back_btn = Button(self.delete_walk_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
-        self.back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
+        # self.back_btn = Button(self.delete_walk_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
+        # self.back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
 
         self.act_heading = Label(self.delete_walk_window,text="Delete Record",font=("Helvetica", 15))
-        self.act_heading.grid(row=1,column=0,columnspan=2,pady=(0,10))
+        self.act_heading.grid(row=1,column=0,columnspan=2,pady=(20,10))
 
         self.id = Label(self.delete_walk_window,text="Id: ",font=("Verdana", 10))
         self.id.grid(row=2,column=0,pady=(15,0),padx=(20,5))
@@ -886,9 +883,58 @@ class Activity:
         self.delete_btn = Button(self.delete_walk_window, text="Delete", padx=20, bg="#ff8383",fg="white",pady=3,font=("Verdana", 10),command=self.delete_sql)
         self.delete_btn.grid(row=5, column=0,columnspan=2, pady=(20, 0)) 
 
+    def update_sql(self):
+
+        self.id_value = int(self.id_entry.get())
+        self.dist = float(self.distance_entry.get())
+        self.time = float(self.time_entry.get())
+        self.weight = float(self.weight_entry.get())
+
+        if (self.dist!="" and self.time!="" and self.weight!="" and float(self.dist) > 0 and float(self.time) > 0 and float(self.weight) > 0):
+            self.speed = self.dist/self.time
+            if self.speed < 3.2:
+                met = 2
+            elif 3.2<self.speed<5.6:
+                met = 3.9
+            else:
+                met=5
+            
+            self.cal = (met * self.weight * self.time)*10/2
+
+            self.update_query = """
+            UPDATE cardio
+            SET distance = %s, time = %s, weight = %s,calories = %s
+            WHERE id = %s
+            """
+        
+            mycur.execute(self.update_query, (self.dist, self.time, self.weight,self.cal, self.id_value))
+
+            messagebox.showinfo("Update Record","Record is Updated Succesfully!")
+            self.update_walk_window.withdraw()
+
+            db.commit()
+
+            self.id_entry.delete(0,END)
+            self.weight_entry.delete(0,END)
+            self.time_entry.delete(0,END)
+            self.distance_entry.delete(0,END)
+
+        else:
+                messagebox.showerror("Invalid value","Please enter valid data")
                 
+                self.id_entry.delete(0,END)
+                self.weight_entry.delete(0,END)
+                self.time_entry.delete(0,END)
+                self.distance_entry.delete(0,END)
 
     def update_record_walk(self):
+
+        global id_entry
+        global distance_entry
+        global time_entry
+        global weight_entry
+        global update_walk_window
+
         self.update_walk_window = Toplevel()
         self.update_walk_window.title("Update")
         self.update_walk_window.geometry("300x300")
@@ -897,11 +943,8 @@ class Activity:
         self.update_walk_window.columnconfigure(0, weight=1)
         self.update_walk_window.columnconfigure(1, weight=1)
 
-        self.back_btn = Button(self.update_walk_window,image=self.resize_back,padx=10,pady=5,relief="flat", borderwidth=0)
-        self.back_btn.grid(row=0, column=0,columnspan=2, padx=5,sticky=NW)
-
         self.act_heading = Label(self.update_walk_window,text="Update Records",font=("Helvetica", 15))
-        self.act_heading.grid(row=1,column=0,columnspan=2,pady=(0,10))
+        self.act_heading.grid(row=1,column=0,columnspan=2,pady=(20,10))
 
         self.id = Label(self.update_walk_window,text="Id: ",font=("Verdana", 10))
         self.id.grid(row=2,column=0,pady=(15,0),padx=(20,5))
@@ -918,8 +961,13 @@ class Activity:
         self.time_entry = Entry(self.update_walk_window,width=22)
         self.time_entry.grid(row=4,column=1, padx=(0,40), pady=(15,0))
 
-        self.update_btn = Button(self.update_walk_window, text="Update", padx=20, pady=3,font=("Verdana", 10))
-        self.update_btn.grid(row=5, column=0,columnspan=2, pady=(20, 0)) 
+        self.weight = Label(self.update_walk_window,text="Weight (Kg): ",font=("Verdana", 10))
+        self.weight.grid(row=5,column=0,pady=(10,0),padx=(20,5))
+        self.weight_entry = Entry(self.update_walk_window,width=22)
+        self.weight_entry.grid(row=5,column=1, padx=(0,40), pady=(15,0))
+
+        self.update_btn = Button(self.update_walk_window, text="Update", padx=20, pady=3,font=("Verdana", 10),command=self.update_sql)
+        self.update_btn.grid(row=6, column=0,columnspan=2, pady=(20, 0)) 
 
         self.update_walk_window.mainloop()
     

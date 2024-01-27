@@ -1,70 +1,95 @@
-import tkinter as tk
-from tkinter import ttk
-import mysql.connector
+import tkinter as tk #done
+from tkinter import ttk#done
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
+from mysql.connector import connect
+from datetime import datetime, timedelta #done
 
-# Assuming db and mycur are previously defined database connection and cursor objects
-# For example:
-# db = mysql.connector.connect(host="your_host", user="your_username", password="your_password", database="your_database")
-# mycur = db.cursor()
+# Function to retrieve walking records from the database
+def fetch_records(time_range):
+    # Replace these placeholders with your actual database credentials
+    db_config = {
+        'user': 'your_username',
+        'password': 'your_password',
+        'host': 'your_host',
+        'database': 'your_database'
+    }
+
+    # Replace 'your_table_name' with your actual table name
+    table_name = 'your_table_name'
+
+    # Replace 'your_date_column' with your actual date column name
+    date_column = 'your_date_column'
+
+    # Connect to the database
+    connection = connect(**db_config)
+    cursor = connection.cursor()
+
+    # Calculate start date based on the time range
+    if time_range == '3 days':
+        start_date = datetime.now() - timedelta(days=3)
+    elif time_range == 'week':
+        start_date = datetime.now() - timedelta(weeks=1)
+    elif time_range == 'month':
+        start_date = datetime.now() - timedelta(weeks=4)
+    elif time_range == 'year':
+        start_date = datetime.now() - timedelta(weeks=52)
+    else:
+        # Default to 3 days if the time range is not recognized
+        start_date = datetime.now() - timedelta(days=3)
+
+    # Fetch records from the database within the specified time range
+    query = f"SELECT {date_column}, distance FROM {table_name} WHERE {date_column} >= %s"
+    cursor.execute(query, (start_date,))
+
+    # Fetch the results
+    results = cursor.fetchall()
+
+    # Close the database connection
+    cursor.close()
+    connection.close()
+
+    return results
+
+# Function to create and display the line graph
+def show_line_graph(time_range):
+    # Fetch walking records
+    records = fetch_records(time_range)
+
+    # Extract dates and distances from the records
+    dates, distances = zip(*records)
+
+    # Create a line graph using Matplotlib
+    fig, ax = plt.subplots()
+    ax.plot(dates, distances, marker='o', linestyle='-')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Distance (in miles)')
+    ax.set_title(f'Walking Records - {time_range}')
+
+    # Display the graph in Tkinter window
+    canvas = FigureCanvasTkAgg(fig, master=window)
+    canvas_widget = canvas.get_tk_widget()
+    canvas_widget.grid(row=1, column=0, columnspan=2, pady=10)
 
 
-# db = mysql.connector.connect(
-#     host = "localhost",
-#     user = "root",
-#     port = 3306,
-#     password = "Harshita@2023",
-#     database= "fitfolio"
-# )
 
-# mycur = db.cursor()
+#GUI
+# Create the main Tkinter window
+window = tk.Tk()
+window.title('Walking Records App')
 
-import tkinter as tk
-from tkinter import ttk
-import tkinter as tk
-from tkinter import ttk
+# Create a dropdown menu for selecting time range
+time_range_label = ttk.Label(window, text='Select Time Range:')
+time_range_label.grid(row=0, column=0, pady=10)
 
-class App:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Data Table")
-        self.root.geometry("400x400")
+time_range_var = tk.StringVar()
+time_range_dropdown = ttk.Combobox(window, textvariable=time_range_var, values=['3 days', 'week', 'month', 'year'])
+time_range_dropdown.grid(row=0, column=1, pady=10)
+time_range_dropdown.set('3 days')  # Set default value
 
-        # Create a Treeview widget
-        self.tree = ttk.Treeview(self.root, columns=("Date", "Distance", "Time", "Calories", "Weight"), height=10)
-        self.tree.heading("Date", text="Date")
-        self.tree.heading("Distance", text="Distance")
-        self.tree.heading("Time", text="Time")
-        self.tree.heading("Calories", text="Calories")
-        self.tree.heading("Weight", text="Weight")
+# Button to display the line graph
+graph_button = ttk.Button(window, text='Show Graph', command=lambda: show_line_graph(time_range_var.get()))
+graph_button.grid(row=0, column=2, pady=10)
 
-        # Set column widths
-        self.tree.column("Date", width=80)
-        self.tree.column("Distance", width=70)
-        self.tree.column("Time", width=70)
-        self.tree.column("Calories", width=80)
-        self.tree.column("Weight", width=70)
-
-        # Add a vertical scrollbar
-        vsb = ttk.Scrollbar(self.root, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscrollcommand=vsb.set)
-
-        # Pack the Treeview and scrollbar
-        self.tree.pack(side="left", fill=tk.BOTH, expand=True)
-        vsb.pack(side="right", fill=tk.Y)
-
-        # Call the populate_treeview method
-        self.populate_treeview("harshita123")
-
-    def populate_treeview(self, username):
-        sql = "SELECT date, distance, time, calories, weight FROM cardio WHERE username = %s"
-        val = (username,)
-        mycur.execute(sql, val)
-        rows = mycur.fetchall()
-
-        for row in rows:
-            self.tree.insert("", "end", values=row)
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = App(root)
-    root.mainloop()
+# Run the Tkinter event loop
+window.mainloop()
