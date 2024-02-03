@@ -46,14 +46,58 @@ VALUES
 ('harshita123', '2024-02-12', 2.7, 25, 130, 55),
 ('harshita123', '2024-02-13', 4.6, 42, 200, 68);
 
+-- CYCLING TABLE
+CREATE TABLE cycling(
+	username VARCHAR(20),
+    distance FLOAT,
+    date TEXT,
+    time FLOAT,
+    calories FLOAT,
+    weight FLOAT
+);
 
+ALTER TABLE cycling
+ADD COLUMN id INT AUTO_INCREMENT PRIMARY KEY;
+
+CREATE TABLE mindfulness(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	username VARCHAR(20),
+    date TEXT,
+    time FLOAT,
+    activity TEXT 
+);
+
+CREATE TABLE sleep(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(20),
+    bed_in TEXT,
+    bed_out TEXT,
+    total_hrs TEXT,
+    date TEXT
+);
+
+CREATE TABLE bmi(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(20),
+    height FLOAT,
+    weight FLOAT,
+    bmi FLOAT,
+    status TEXT,
+    date TEXT
+);
+
+SELECT * FROM bmi;
+
+SELECT * FROM sleep;
+
+SELECT * FROM mindfulness;
+
+SELECT * FROM cycling;
 
 SELECT * FROM users;
 
 SELECT * FROM cardio;
 
-
-
 DROP DATABASE fitfolio;
 
-DROP TABLE cardio;
+DROP TABLE sleep;
